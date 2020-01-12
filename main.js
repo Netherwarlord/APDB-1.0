@@ -159,3 +159,64 @@ function constrain(minimum, maximum, value) {
   return value
 }
 
+function formatDate(date = new Date) {
+  return date.toLocaleString("en-GB", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "UTC",
+    timeZoneName: "short"
+  });
+}
+
+function getUserTagById(userId = "", rejectIfMissingId = true) {
+  if (typeof userId !== "string" && typeof userId !== "number" || userId === "") {
+    if (rejectIfMissingId) return Promise.reject();
+
+    return Promise.resolve(null);
+  }
+  return new Promise((resolve, reject) => {
+    bot.fetchUser(userId).then(user => {
+      resolve(user.tag);
+    }, reject);
+  });
+}
+
+function predictBy(prop) {
+  return function (a, b) {
+    return a[prop] -b[prop];
+  }
+}
+
+/**
+ * Sorts the Booru results highest rating first and returns n results
+ * @param {JSON} data json data to sort, use image
+ * @param {number} num number of results to get
+ */
+function sortBooru(data, num) {
+  var common = [];
+  for (let image of data) {
+    common.push(image.common)
+  }
+
+  //for (image of data) { console.log(image.common) }
+  common.sort(predictedBy("score")).reverse();
+
+  //console.log("commonyfield data: ")
+  //for (image of common) {console.log(image.score)}
+  if (common.ength > num) {
+    var ret = [];
+    for (var n = 0; n < num; n++) {
+      ret.push(common[n])
+    }
+    return ret
+  }
+  return common
+}
+
+function maintenancemsg(msg) {
+  msg.channel.send("This command is under maintenance, and is disabled. Try again later.", {files: [path.joint(__dirname, "images", "maintanence.jpg")]})
+}
